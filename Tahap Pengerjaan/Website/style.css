@@ -1,0 +1,362 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --accent-color: #f093fb;
+    --text-color: #333;
+    --light-bg: #f8f9ff;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: var(--text-color);
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px) translateX(0px);
+    }
+
+    50% {
+        transform: translateY(-20px) translateX(20px);
+    }
+}
+
+header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(135deg, #fff 0%, #f0f0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Main Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+/* Headings */
+h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 2rem 0 1.5rem 0;
+    color: white;
+    text-align: center;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color) 0%, var(--primary-color) 100%);
+    border-radius: 2px;
+}
+
+/* Anggota Kelompok Section */
+.Anggota-Kelompok {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.Anggota-1,
+.Anggota-2,
+.Anggota-3 {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 15px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.Anggota-1::before,
+.Anggota-2::before,
+.Anggota-3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.Anggota-1:hover,
+.Anggota-2:hover,
+.Anggota-3:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.Anggota-1:hover::before,
+.Anggota-2:hover::before,
+.Anggota-3:hover::before {
+    opacity: 1;
+}
+
+.Anggota-1:hover h3,
+.Anggota-2:hover h3,
+.Anggota-3:hover h3,
+.Anggota-1:hover p,
+.Anggota-2:hover p,
+.Anggota-3:hover p {
+    color: white;
+}
+
+.Foto-Anggota {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: var(--transition);
+}
+
+.Anggota-1:hover .Foto-Anggota,
+.Anggota-2:hover .Foto-Anggota,
+.Anggota-3:hover .Foto-Anggota {
+    transform: scale(1.1) rotate(2deg);
+    border-color: white;
+}
+
+.Anggota-1 h3,
+.Anggota-2 h3,
+.Anggota-3 h3 {
+    font-size: 1.5rem;
+    margin: 1rem 0 0.5rem 0;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.Anggota-1 p,
+.Anggota-2 p,
+.Anggota-3 p {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #666;
+    transition: var(--transition);
+}
+
+/* Deskripsi Proyek */
+.Deskripsi-Proyek {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 3rem;
+    line-height: 1.8;
+}
+
+.Deskripsi-Proyek p {
+    font-size: 1.1rem;
+    color: #555;
+    text-align: justify;
+}
+
+/* Input Section */
+.Input-Ulasan {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 3rem;
+}
+
+.Input-Text,
+.Input-File-Excel {
+    margin-bottom: 2rem;
+}
+
+.Input-Text h3,
+.Input-File-Excel h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+#ulasan {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 120px;
+    transition: var(--transition);
+}
+
+#ulasan:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+    background-color: #f8f9ff;
+}
+
+#analyze-btn {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 1rem;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#analyze-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+#analyze-btn:active {
+    transform: translateY(-1px);
+}
+
+#file-upload {
+    padding: 0.8rem;
+    border: 2px dashed var(--primary-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: block;
+    width: 100%;
+}
+
+#file-upload:hover {
+    background-color: #f8f9ff;
+}
+
+/* Hasil Analisis */
+.Hasil-Analisis {
+    background: white;
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.Hasil-String,
+.Hasil-Grafik {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f0ff 100%);
+    border-radius: 15px;
+    border-left: 5px solid var(--primary-color);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .Anggota-Kelompok {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .Input-Ulasan,
+    .Hasil-Analisis,
+    .Deskripsi-Proyek {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* Animation for page load */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+header,
+.Anggota-Kelompok,
+.Deskripsi-Proyek,
+.Input-Ulasan,
+.Hasil-Analisis {
+    animation: slideInUp 0.6s ease-out forwards;
+}

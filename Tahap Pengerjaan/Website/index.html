@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentimen Analysis</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Praktikum AI Kelompok 4 A2 Stammbuk 2024</h1>
+    </header>
+    <div class="container">
+      <h2>Anggota Kelompok</h2>
+      <div class="Anggota-Kelompok">
+        <div class="Anggota-1">
+          <img
+            src="img/Annisa Jannayanti adnin.jpg"
+            alt="Foto Anggota 1"
+            class="Foto-Anggota"
+          />
+          <h3>Annisa Jannati 'adnin</h3>
+          <p>241712033</p>
+        </div>
+        <div class="Anggota-2">
+          <img
+            src="img/William Tanu Wijaya.jpg"
+            alt="Foto Anggota 2"
+            class="Foto-Anggota"
+          />
+          <h3>William Tanu Wijaya</h3>
+          <p>241712036</p>
+        </div>
+        <div class="Anggota-3">
+          <img
+            src="img/Rivaldo Nainggolan.jpg"
+            alt="Foto Anggota 3"
+            class="Foto-Anggota"
+          />
+          <h3>Rivaldo Nainggolan</h3>
+          <p>241712043</p>
+        </div>
+      </div>
+      <h2>Deskripsi Proyek</h2>
+      <div class="Deskripsi-Proyek">
+        <p>
+          Proyek Kelompok 4 Praktikum Kecerdasan Buatan ini bertujuan untuk
+          membangun sistem Analisis Sentimen Ulasan Pelanggan E-Commerce
+          menggunakan metode Machine Learning dengan implementasi berbasis web
+          application. Sistem dikembangkan menggunakan dataset ulasan pelanggan
+          dari platform e-commerce seperti Tokopedia dan Shopee untuk
+          mengidentifikasi opini atau emosi pengguna terhadap suatu produk.
+          Aplikasi ini menerima input berupa teks ulasan pelanggan, kemudian
+          memproses dan mengklasifikasikan sentimen ke dalam tiga kategori yaitu
+          Positif, Negatif, dan Netral. Selain klasifikasi sentimen, sistem juga
+          menampilkan tingkat kepercayaan (confidence score) hasil prediksi,
+          analisis kata-kata yang sering muncul pada ulasan positif maupun
+          negatif, serta visualisasi data berupa pie chart dan wordcloud. Proses
+          pengembangan sistem dilakukan melalui beberapa tahapan, yaitu
+          pengambilan dataset, pembersihan data, pelabelan otomatis berdasarkan
+          rating produk, text preprocessing seperti tokenization dan stemming,
+          ekstraksi fitur menggunakan TF-IDF, pelatihan model Machine Learning
+          seperti Naive Bayes, Logistic Regression, atau Support Vector Machine,
+          serta evaluasi performa model menggunakan confusion matrix, accuracy,
+          precision, recall, dan F1-score. Hasil akhir dari proyek ini berupa
+          aplikasi web interaktif yang memungkinkan pengguna memasukkan ulasan
+          produk dan memperoleh hasil analisis sentimen secara langsung sehingga
+          dapat membantu memahami opini pelanggan terhadap suatu produk atau
+          layanan.
+        </p>
+      </div>
+
+      <div class="Input-Ulasan">
+        <div class="Input-Text">
+          <h3>Silahkan Masukkan Ulasan Terkait Produk</h3>
+          <textarea
+            id="ulasan"
+            placeholder="Masukkan ulasan produk di sini..."
+          ></textarea>
+          <button id="analyze-btn">Analisis Sentimen</button>
+        </div>
+        <div class="Input-File-Excel">
+          <h3>Atau Upload File Excel Berisi Ulasan</h3>
+          <input type="file" id="file-upload" accept=".xlsx, .xls, .csv" />
+        </div>
+      </div>
+
+      <div class="Hasil-Analisis">
+        <h2>Hasil Analisis Sentimen</h2>
+        <div class="Hasil-String">
+          <h3>Prediksi Ulasan Negatif atau Tidak</h3>
+        </div>
+        <div class="Hasil-Grafik">
+          <h3>Grafik Ulasan Berdasarkan File</h3>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
