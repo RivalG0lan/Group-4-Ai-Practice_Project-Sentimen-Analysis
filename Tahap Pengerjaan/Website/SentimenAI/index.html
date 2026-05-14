@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SentimenAI – Kelompok 4</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="header-badge">
+          Praktikum Kecerdasan Buatan · Kelas A2 · Angkatan 2024
+        </div>
+        <h1>SentimenAI</h1>
+        <p class="header-sub">Analisis Sentimen Ulasan Pelanggan E-Commerce</p>
+      </div>
+    </header>
+
+    <div class="container">
+      <!-- ── Anggota ─────────────────────────────────────────── -->
+      <section>
+        <h2>Anggota Kelompok 4</h2>
+        <div class="Anggota-Kelompok">
+          <div class="Anggota-1">
+            <img
+              src="img/Annisa Jannayanti adnin.jpg"
+              alt="Annisa"
+              class="Foto-Anggota"
+            />
+            <h3>Annisa Jayanti Ad'nin</h3>
+            <p>241712033</p>
+          </div>
+          <div class="Anggota-2">
+            <img
+              src="img/William Tanu Wijaya.jpg"
+              alt="William"
+              class="Foto-Anggota"
+            />
+            <h3>William Tanu Wijaya</h3>
+            <p>241712036</p>
+          </div>
+          <div class="Anggota-3">
+            <img
+              src="img/Rivaldo Nainggolan.jpg"
+              alt="Rivaldo"
+              class="Foto-Anggota"
+            />
+            <h3>Rivaldo Nainggolan</h3>
+            <p>241712043</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Deskripsi ───────────────────────────────────────── -->
+      <section>
+        <h2>Deskripsi Proyek</h2>
+        <div class="Deskripsi-Proyek">
+          <p>
+            Proyek ini membangun sistem
+            <strong>Analisis Sentimen Ulasan Pelanggan E-Commerce</strong>
+            menggunakan Machine Learning berbasis TF-IDF + Naive Bayes
+            (ComplementNB). Sistem mengklasifikasikan ulasan ke tiga kategori:
+            <strong>Positif 😊</strong>, <strong>Netral 😐</strong>, dan
+            <strong>Negatif 😡</strong>, dilengkapi confidence score, insight
+            kata kunci, serta visualisasi pie chart dan wordcloud.
+          </p>
+        </div>
+      </section>
+
+      <!-- ── Input ───────────────────────────────────────────── -->
+      <section>
+        <h2>Analisis Sentimen</h2>
+        <div class="Input-Ulasan">
+          <!-- Tab -->
+          <div class="tabs">
+            <button class="tab active" data-tab="text">✏️ Ketik Ulasan</button>
+            <button class="tab" data-tab="file">📂 Upload File</button>
+          </div>
+
+          <!-- Panel: teks -->
+          <div class="tab-panel active" id="panel-text">
+            <h3>Silahkan Masukkan Ulasan Terkait Produk</h3>
+            <textarea
+              id="ulasan"
+              placeholder="Contoh: Barang bagus banget, pengiriman cepat dan aman 😊"
+              rows="5"
+            ></textarea>
+            <div class="char-count"><span id="char-num">0</span> karakter</div>
+            <button class="analyze-btn" id="btn-text">
+              🔍 Analisis Sentimen
+            </button>
+          </div>
+
+          <!-- Panel: file -->
+          <div class="tab-panel" id="panel-file">
+            <h3>Upload File Excel / CSV Berisi Ulasan</h3>
+            <p class="hint">
+              File harus memiliki kolom <code>review</code>,
+              <code>review_cleaned</code>, atau <code>ulasan</code>.
+            </p>
+            <label class="file-drop" id="file-drop">
+              <div class="file-drop-icon">📁</div>
+              <div class="file-drop-text">
+                Drag & drop atau <span>pilih file</span>
+              </div>
+              <div class="file-drop-sub">.xlsx / .xls / .csv</div>
+              <input
+                type="file"
+                id="file-upload"
+                accept=".xlsx,.xls,.csv"
+                hidden
+              />
+            </label>
+            <div id="file-name-display" class="file-name-display" hidden></div>
+            <button class="analyze-btn" id="btn-file">📊 Analisis File</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Hasil ───────────────────────────────────────────── -->
+      <section id="section-hasil" hidden>
+        <h2>Hasil Analisis</h2>
+        <div class="Hasil-Analisis" id="hasil-container">
+          <!-- diisi JS -->
+        </div>
+      </section>
+    </div>
+    <!-- /container -->
+
+    <!-- ── Toast ──────────────────────────────────────────────── -->
+    <div id="toast" class="toast" hidden></div>
+
+    <!-- ── Loading overlay ────────────────────────────────────── -->
+    <div id="loading" class="loading-overlay" hidden>
+      <div class="spinner"></div>
+      <p>Sedang menganalisis…</p>
+    </div>
+
+    <script>
+      // ══════════════════════════════════════════════════════
+      //  CONFIG — ganti sesuai URL server Flask kamu
+      // ══════════════════════════════════════════════════════
+      const API = "http://localhost:5000";
+
+      // ── Tabs ─────────────────────────────────────────────
+      document.querySelectorAll(".tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".tab")
+            .forEach((b) => b.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-panel")
+            .forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .getElementById("panel-" + btn.dataset.tab)
+            .classList.add("active");
+        });
+      });
+
+      // ── Char counter ─────────────────────────────────────
+      const ulasanEl = document.getElementById("ulasan");
+      ulasanEl.addEventListener("input", () => {
+        document.getElementById("char-num").textContent = ulasanEl.value.length;
+      });
+
+      // ── File drop ────────────────────────────────────────
+      const fileInput = document.getElementById("file-upload");
+      const fileDropEl = document.getElementById("file-drop");
+      const fileNameEl = document.getElementById("file-name-display");
+
+      fileDropEl.addEventListener("click", () => fileInput.click());
+      fileDropEl.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        fileDropEl.classList.add("dragover");
+      });
+      fileDropEl.addEventListener("dragleave", () =>
+        fileDropEl.classList.remove("dragover"),
+      );
+      fileDropEl.addEventListener("drop", (e) => {
+        e.preventDefault();
+        fileDropEl.classList.remove("dragover");
+        if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+      });
+      fileInput.addEventListener("change", () => {
+        if (fileInput.files[0]) setFile(fileInput.files[0]);
+      });
+
+      function setFile(f) {
+        fileInput._file = f;
+        fileNameEl.textContent = `📄 ${f.name} (${(f.size / 1024).toFixed(1)} KB)`;
+        fileNameEl.hidden = false;
+      }
+
+      // ── Toast ────────────────────────────────────────────
+      function showToast(msg, type = "error") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = `toast ${type}`;
+        t.hidden = false;
+        setTimeout(() => {
+          t.hidden = true;
+        }, 3500);
+      }
+
+      // ── Loading ──────────────────────────────────────────
+      function setLoading(on) {
+        document.getElementById("loading").hidden = !on;
+      }
+
+      // ── Analisis teks ────────────────────────────────────
+      document
+        .getElementById("btn-text")
+        .addEventListener("click", async () => {
+          const text = ulasanEl.value.trim();
+          if (!text) {
+            showToast("Silahkan masukkan ulasan terlebih dahulu! ✍️");
+            return;
+          }
+
+          setLoading(true);
+          try {
+            const res = await fetch(`${API}/predict/text`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ review: text }),
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            renderHasilTeks(data);
+          } catch (e) {
+            showToast(
+              "Gagal terhubung ke server. Pastikan Flask sudah berjalan. (" +
+                e.message +
+                ")",
+            );
+          } finally {
+            setLoading(false);
+          }
+        });
+
+      // ── Analisis file ────────────────────────────────────
+      document
+        .getElementById("btn-file")
+        .addEventListener("click", async () => {
+          const file = fileInput._file || fileInput.files[0];
+          if (!file) {
+            showToast("Silahkan upload file terlebih dahulu! 📂");
+            return;
+          }
+
+          setLoading(true);
+          const fd = new FormData();
+          fd.append("file", file);
+          try {
+            const res = await fetch(`${API}/predict/file`, {
+              method: "POST",
+              body: fd,
+            });
+            const data = await res.json();
+            if (data.error) throw new Error(data.error);
+            renderHasilFile(data);
+          } catch (e) {
+            showToast("Gagal terhubung ke server. (" + e.message + ")");
+          } finally {
+            setLoading(false);
+          }
+        });
+
+      // ══════════════════════════════════════════════════════
+      //  Render hasil TEKS (satu ulasan)
+      // ══════════════════════════════════════════════════════
+      function renderHasilTeks(d) {
+        const warna = {
+          Positif: "#22c55e",
+          Netral: "#f59e0b",
+          Negatif: "#ef4444",
+        };
+        const w = warna[d.sentimen];
+
+        const bars = Object.entries(d.confidence)
+          .map(
+            ([label, pct]) =>
+              `<div class="conf-row">
+          <span class="conf-label">${label}</span>
+          <div class="conf-bar-wrap">
+            <div class="conf-bar" style="width:${pct}%;background:${warna[label]}"></div>
+          </div>
+          <span class="conf-pct">${pct}%</span>
+        </div>`,
+          )
+          .join("");
+
+        document.getElementById("hasil-container").innerHTML = `
+        <div class="hasil-teks-card" style="border-top:5px solid ${w}">
+          <div class="hasil-badge" style="background:${w}">${d.emoji} ${d.sentimen}</div>
+          <blockquote class="hasil-review">"${d.review}"</blockquote>
+          <h4>Confidence Score</h4>
+          <div class="conf-bars">${bars}</div>
+        </div>`;
+
+        document.getElementById("section-hasil").hidden = false;
+        document
+          .getElementById("section-hasil")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // ══════════════════════════════════════════════════════
+      //  Render hasil FILE (banyak ulasan)
+      // ══════════════════════════════════════════════════════
+      let pieChart = null;
+
+      function renderHasilFile(d) {
+        const { total, distribusi, top_positif, top_negatif, samples } = d;
+
+        // ─ stat cards ─
+        const statCards = [
+          { label: "Total Ulasan", val: total, color: "#6366f1" },
+          {
+            label: "😊 Positif",
+            val: `${distribusi.Positif.count} (${distribusi.Positif.pct}%)`,
+            color: "#22c55e",
+          },
+          {
+            label: "😐 Netral",
+            val: `${distribusi.Netral.count}  (${distribusi.Netral.pct}%)`,
+            color: "#f59e0b",
+          },
+          {
+            label: "😡 Negatif",
+            val: `${distribusi.Negatif.count} (${distribusi.Negatif.pct}%)`,
+            color: "#ef4444",
+          },
+        ]
+          .map(
+            (s) => `
+        <div class="stat-card" style="border-top:4px solid ${s.color}">
+          <div class="stat-val" style="color:${s.color}">${s.val}</div>
+          <div class="stat-label">${s.label}</div>
+        </div>`,
+          )
+          .join("");
+
+        // ─ wordcloud helper ─
+        const makeCloud = (words, color) =>
+          words
+            .map((w) => {
+              const sz = 14 + Math.min(w.count, 80) * 0.5;
+              return `<span class="wc-word" style="font-size:${sz}px;color:${color};opacity:${0.55 + w.count / 120}">${w.word}</span>`;
+            })
+            .join(" ");
+
+        // ─ sample table ─
+        const rows = samples
+          .map((s) => {
+            const warna = {
+              Positif: "#22c55e",
+              Netral: "#f59e0b",
+              Negatif: "#ef4444",
+            };
+            return `<tr>
+          <td class="td-review">${s.review.slice(0, 80)}${s.review.length > 80 ? "…" : ""}</td>
+          <td><span class="badge-sentimen" style="background:${warna[s.sentimen]}">${s.emoji} ${s.sentimen}</span></td>
+          <td>${s.confidence[s.sentimen]}%</td>
+        </tr>`;
+          })
+          .join("");
+
+        document.getElementById("hasil-container").innerHTML = `
+        <div class="stat-grid">${statCards}</div>
+
+        <div class="chart-word-wrap">
+          <div class="chart-box">
+            <h4>📊 Distribusi Sentimen</h4>
+            <canvas id="pieChart"></canvas>
+          </div>
+          <div class="word-box">
+            <h4>🟢 Kata Sering – Positif</h4>
+            <div class="wordcloud">${makeCloud(top_positif, "#16a34a")}</div>
+            <h4 style="margin-top:1.5rem">🔴 Kata Sering – Negatif</h4>
+            <div class="wordcloud">${makeCloud(top_negatif, "#dc2626")}</div>
+          </div>
+        </div>
+
+        <div class="sample-section">
+          <h4>🔎 Preview 5 Data Pertama</h4>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Ulasan</th><th>Sentimen</th><th>Confidence</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+        // ─ pie chart ─
+        if (pieChart) pieChart.destroy();
+        const ctx = document.getElementById("pieChart").getContext("2d");
+        pieChart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["Positif 😊", "Netral 😐", "Negatif 😡"],
+            datasets: [
+              {
+                data: [
+                  distribusi.Positif.count,
+                  distribusi.Netral.count,
+                  distribusi.Negatif.count,
+                ],
+                backgroundColor: ["#22c55e", "#f59e0b", "#ef4444"],
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: "bottom" },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) =>
+                    ` ${ctx.label}: ${ctx.parsed} (${((ctx.parsed / total) * 100).toFixed(1)}%)`,
+                },
+              },
+            },
+          },
+        });
+
+        document.getElementById("section-hasil").hidden = false;
+        document
+          .getElementById("section-hasil")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    </script>
+  </body>
+</html>
