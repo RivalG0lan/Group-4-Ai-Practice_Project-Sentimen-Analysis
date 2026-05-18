@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import joblib
 import numpy as np
@@ -7,18 +7,16 @@ import os
 import re
 from collections import Counter
 
-app = Flask(__name__, static_folder='.')
+app = Flask(__name__)
 CORS(app)
 
-# ─── Load Model ───────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 tfidf = joblib.load(os.path.join(BASE_DIR, 'model_tfidf.joblib'))
-model = joblib.load(os.path.join(BASE_DIR, 'sentiment_model.joblib'))  # ComplementNB
+model = joblib.load(os.path.join(BASE_DIR, 'sentiment_model.joblib'))
 
 LABEL_MAP   = {0: 'Negatif', 1: 'Netral', 2: 'Positif'}
 LABEL_EMOJI = {0: '😡', 1: '😐', 2: '😊'}
 
-# ─── Helper ───────────────────────────────────────────────────────────────────
 def clean_text(text: str) -> str:
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
@@ -30,7 +28,6 @@ def predict_one(text: str) -> dict:
     vec     = tfidf.transform([cleaned])
     label   = int(model.predict(vec)[0])
     proba   = model.predict_proba(vec)[0]
-
     return {
         'review'    : text,
         'label'     : label,
@@ -44,19 +41,16 @@ def predict_one(text: str) -> dict:
     }
 
 def top_words(texts, n=15):
-    """Ambil kata yang paling sering muncul dari list teks."""
     all_words = []
     for t in texts:
         words = clean_text(str(t)).split()
-        # filter kata terlalu pendek
         all_words.extend([w for w in words if len(w) > 3])
     counter = Counter(all_words)
     return [{'word': w, 'count': c} for w, c in counter.most_common(n)]
 
-# ─── Routes ───────────────────────────────────────────────────────────────────
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return render_template('index.html')
 
 @app.route('/predict/text', methods=['POST'])
 def predict_text():
@@ -68,21 +62,23 @@ def predict_text():
 
 @app.route('/predict/file', methods=['POST'])
 def predict_file():
+    print("=== FILE DITERIMA ===")
     if 'file' not in request.files:
         return jsonify({'error': 'File tidak ditemukan'}), 400
 
     f = request.files['file']
-    fname = f.filename.lower()
+    print(f"Nama file: {f.filename}")
 
     try:
-        if fname.endswith('.csv'):
+        if f.filename.lower().endswith('.csv'):
             df = pd.read_csv(f)
         else:
             df = pd.read_excel(f)
+        print(f"Shape: {df.shape}, Kolom: {df.columns.tolist()}")
     except Exception as e:
+        print(f"ERROR baca file: {e}")
         return jsonify({'error': f'Gagal membaca file: {str(e)}'}), 400
 
-    # cari kolom teks
     text_col = None
     for candidate in ['review_cleaned', 'review', 'ulasan', 'text', 'comment']:
         if candidate in df.columns:
@@ -90,33 +86,67 @@ def predict_file():
             break
     if text_col is None:
         text_col = df.columns[0]
+    print(f"Kolom dipakai: {text_col}")
 
     df = df.dropna(subset=[text_col])
     df[text_col] = df[text_col].astype(str)
+    print(f"Jumlah baris: {len(df)}")
 
-    results   = [predict_one(t) for t in df[text_col].tolist()]
+    try:
+        texts = df[text_col].tolist()
+        cleaned_texts = [clean_text(t) for t in texts]
+        vecs       = tfidf.transform(cleaned_texts)
+        labels_arr = model.predict(vecs)
+        probas     = model.predict_proba(vecs)
+
+        results = []
+        for i, text in enumerate(texts):
+            label = int(labels_arr[i])
+            proba = probas[i]
+            results.append({
+                'review'    : text,
+                'label'     : label,
+                'sentimen'  : LABEL_MAP[label],
+                'emoji'     : LABEL_EMOJI[label],
+                'confidence': {
+                    'Negatif': round(float(proba[0]) * 100, 1),
+                    'Netral' : round(float(proba[1]) * 100, 1),
+                    'Positif': round(float(proba[2]) * 100, 1),
+                }
+            })
+        print(f"Prediksi selesai: {len(results)} hasil")
+    except Exception as e:
+        print(f"ERROR prediksi: {e}")
+        return jsonify({'error': f'Gagal prediksi: {str(e)}'}), 500
+
     labels    = [r['label'] for r in results]
     sentimens = [r['sentimen'] for r in results]
 
-    # distribusi
-    from collections import Counter
-    dist = Counter(sentimens)
+    dist  = Counter(sentimens)
     total = len(results)
     distribusi = {s: {'count': dist.get(s, 0),
-                      'pct'  : round(dist.get(s, 0)/total*100, 1)}
+                      'pct'  : round(dist.get(s, 0) / total * 100, 1)}
                   for s in ['Positif', 'Netral', 'Negatif']}
 
-    # kata sering per sentimen
-    pos_texts = [df[text_col].iloc[i] for i, l in enumerate(labels) if l == 2]
-    neg_texts = [df[text_col].iloc[i] for i, l in enumerate(labels) if l == 0]
+    pos_texts = [texts[i] for i, l in enumerate(labels) if l == 2]
+    neg_texts = [texts[i] for i, l in enumerate(labels) if l == 0]
 
     return jsonify({
-        'total'     : total,
-        'distribusi': distribusi,
+        'total'      : total,
+        'distribusi' : distribusi,
         'top_positif': top_words(pos_texts),
         'top_negatif': top_words(neg_texts),
-        'samples'   : results[:5],   # preview 5 baris pertama
+        'samples'    : results[:5],
     })
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+    
+    
+    
+#     Loop satu-satu (sebelumnya):
+# setiap predict_one() dipanggil 67906 kali, dan tiap kali itu Python harus: buat sparse matrix baru → panggil fungsi predict → panggil fungsi proba → return. Overhead pemanggilan fungsi Python itu mahal kalau diulang puluhan ribu kali.
+# Batch (sekarang):
+# tfidf.transform(cleaned_texts) memproses semua 67906 teks sekaligus menjadi satu sparse matrix besar, lalu model.predict(vecs) dan model.predict_proba(vecs) beroperasi pada matrix itu dalam satu operasi numpy/scipy.
+# Intinya, TF-IDF dan Naive Bayes di balik layar adalah operasi matrix multiplication — dan numpy/scipy sangat dioptimasi untuk perkalian matrix besar sekaligus menggunakan BLAS/LAPACK yang berjalan di level C, bukan Python. Jadi daripada 67906 perkalian matrix kecil yang masing-masing punya overhead, kamu melakukan 1 perkalian matrix besar yang jauh lebih efisien secara CPU cache dan memory access.
+# Analogi sederhananya: seperti perbedaan antara bolak-balik ke dapur 67906 kali untuk ambil 1 piring vs sekali jalan bawa semua 67906 piring sekaligus pakai troli.
