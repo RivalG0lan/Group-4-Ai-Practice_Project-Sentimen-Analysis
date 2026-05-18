@@ -22,7 +22,7 @@ Selain itu, aplikasi juga menampilkan:
 
 ## Full Page Website
 
-![Website Preview](static/img/website-full-page.jpeg)
+![Website Preview](SentimenAI/static/img/website-full-page.jpeg)
 
 ---
 
