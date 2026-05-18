@@ -84,7 +84,7 @@
         font-size: 1.05rem;
     }
 
-    
+
     .container {
         max-width: 1100px;
         margin: 0 auto;
@@ -607,25 +607,52 @@
         }
     }
 
-    /* loading */
+    /* Loading Overlay*/
     .loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 15, 26, 0.72);
+        backdrop-filter: blur(6px);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+
+        z-index: 9999;
+
         opacity: 0;
-        pointer-events: none;
-        transition: 0.2s ease;
+        visibility: hidden;
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease;
     }
 
     .loading-overlay.active {
         opacity: 1;
-        pointer-events: all;
+        visibility: visible;
     }
 
     .spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid rgba(99, 102, 241, 0.2);
-        border-top-color: var(--primary);
+        width: 58px;
+        height: 58px;
         border-radius: 50%;
-        animation: spin .8s linear infinite;
+
+        border: 5px solid rgba(255, 255, 255, 0.12);
+        border-top-color: var(--primary);
+
+        animation: spin .7s linear infinite;
+
+        box-shadow:
+            0 0 25px rgba(99, 102, 241, .35);
+    }
+
+    .loading-overlay p {
+        color: #cbd5e1;
+        font-size: .95rem;
+        font-weight: 600;
+        letter-spacing: .02em;
     }
 
     @keyframes spin {
@@ -634,12 +661,7 @@
         }
     }
 
-    .loading-overlay p {
-        color: var(--muted);
-        font-weight: 600;
-    }
-
-    /* ─── Responsive ──────────────────────────── */
+    /* responsivitas */
     @media (max-width: 768px) {
         .chart-word-wrap {
             grid-template-columns: 1fr;

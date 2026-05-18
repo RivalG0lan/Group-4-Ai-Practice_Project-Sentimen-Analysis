@@ -25,7 +25,7 @@
 
     <div class="container">
 
-      <!-- ── Anggota ─────────────────────────────────────────── -->
+      <!-- anggota-->
       <section>
         <h2>Anggota Kelompok 4</h2>
         <div class="Anggota-Kelompok">
@@ -59,7 +59,7 @@
         </div>
       </section>
 
-      <!-- ── Deskripsi ───────────────────────────────────────── -->
+      <!--deskripsi-->
       <section>
         <h2>Deskripsi Proyek</h2>
         <div class="Deskripsi-Proyek">
@@ -75,7 +75,7 @@
         </div>
       </section>
 
-      <!-- ── Input ───────────────────────────────────────────── -->
+      <!-- input -->
       <section>
         <h2>Analisis Sentimen</h2>
         <div class="Input-Ulasan">
@@ -120,7 +120,7 @@
         </div>
       </section>
 
-      <!-- ── Hasil ───────────────────────────────────────────── -->
+      <!-- Hasil -->
       <section id="section-hasil" hidden>
         <h2>Hasil Analisis</h2>
         <div class="Hasil-Analisis" id="hasil-container">
@@ -134,7 +134,7 @@
     <div id="toast" class="toast" hidden></div>
 
     <!-- Loading overlay -->
-    <div id="loading" class="loading-overlay" hidden>
+    <div id="loading" class="loading-overlay">
       <div class="spinner"></div>
       <p>Sedang menganalisis…</p>
     </div>
@@ -142,7 +142,7 @@
     <script>
       const API = "http://localhost:5000";
 
-      // ── Tabs ─────────────────────────────────────────────
+      // tabs
       document.querySelectorAll(".tab").forEach((btn) => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".tab").forEach((b) => b.classList.remove("active"));
@@ -152,13 +152,13 @@
         });
       });
 
-      // ── Char counter ─────────────────────────────────────
+      // pnghitung char
       const ulasanEl = document.getElementById("ulasan");
       ulasanEl.addEventListener("input", () => {
         document.getElementById("char-num").textContent = ulasanEl.value.length;
       });
 
-      // ── File drop ────────────────────────────────────────
+      // masukin file ngedrop
       const fileInput  = document.getElementById("file-upload");
       const fileDropEl = document.getElementById("file-drop");
       const fileNameEl = document.getElementById("file-name-display");
@@ -184,7 +184,7 @@
         fileNameEl.hidden = false;
       }
 
-      // ── Toast ────────────────────────────────────────────
+      // toast
       function showToast(msg, type = "error") {
         const t = document.getElementById("toast");
         t.textContent = msg;
@@ -193,12 +193,12 @@
         setTimeout(() => { t.hidden = true; }, 3500);
       }
 
-      // ── Loading ──────────────────────────────────────────
+      // loding
       function setLoading(on) {
         document.getElementById("loading").classList.toggle("active", on);
       }
 
-      // ── Analisis teks ─────────────────────────────────────
+      // analisis teks string ulasang
       document.getElementById("btn-text").addEventListener("click", async () => {
         const text = ulasanEl.value.trim();
         if (!text) {
@@ -222,7 +222,7 @@
         }
       });
 
-      // ── Analisis file ─────────────────────────────────────
+      // analisis file
       document.getElementById("btn-file").addEventListener("click", async () => {
         const file = fileInput._file || fileInput.files[0];
         if (!file) {
@@ -244,9 +244,7 @@
         }
       });
 
-      // ══════════════════════════════════════════════════════
       //  Render hasil TEKS (satu ulasan)
-      // ══════════════════════════════════════════════════════
       function renderHasilTeks(d) {
         const warna = { Positif: "#22c55e", Netral: "#f59e0b", Negatif: "#ef4444" };
         const w = warna[d.sentimen];
@@ -272,9 +270,7 @@
         document.getElementById("section-hasil").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
-      // ══════════════════════════════════════════════════════
       //  Render hasil FILE (banyak ulasan)
-      // ══════════════════════════════════════════════════════
       let pieChart   = null;
       let allResults = [];
       let shownCount = 0;
@@ -374,7 +370,7 @@
         document.getElementById("section-hasil").scrollIntoView({ behavior: "smooth", block: "start" });
       }
 
-      // ── Pagination rows ───────────────────────────────────
+      // page row muat 50 data
       function loadMoreRows() {
         const warna   = { Positif: "#22c55e", Netral: "#f59e0b", Negatif: "#ef4444" };
         const tbody   = document.getElementById("tabel-body");

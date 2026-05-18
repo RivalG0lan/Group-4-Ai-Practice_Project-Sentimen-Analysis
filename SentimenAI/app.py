@@ -1,4 +1,4 @@
-# ─── Auto-install dependencies ────────────────────────────────────────────────
+#Auto-install dependencies library python
 import subprocess
 import sys
  
@@ -36,7 +36,7 @@ def install_if_missing(packages):
         print("[✓] Dependencies selesai diinstall, siap jalan.")
  
 install_if_missing(REQUIRED)
-# ──────────────────────────────────────────────────────────────────────────────
+
  
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
@@ -50,7 +50,7 @@ from collections import Counter
 app = Flask(__name__)
 CORS(app)
  
-# ─── Load Model ───────────────────────────────────────────────────────────────
+# ngeload model dan vectorizer
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 tfidf = joblib.load(os.path.join(BASE_DIR, 'model_tfidf.joblib'))
 model = joblib.load(os.path.join(BASE_DIR, 'sentiment_model.joblib'))
@@ -58,7 +58,7 @@ model = joblib.load(os.path.join(BASE_DIR, 'sentiment_model.joblib'))
 LABEL_MAP   = {0: 'Negatif', 1: 'Netral', 2: 'Positif'}
 LABEL_EMOJI = {0: '😡', 1: '😐', 2: '😊'}
  
-# ─── Helper ───────────────────────────────────────────────────────────────────
+# helper
 def clean_text(text: str) -> str:
     text = text.lower()
     text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
@@ -90,7 +90,7 @@ def top_words(texts, n=15):
     counter = Counter(all_words)
     return [{'word': w, 'count': c} for w, c in counter.most_common(n)]
  
-# ─── Routes ───────────────────────────────────────────────────────────────────
+#rute
 @app.route('/')
 def index():
     return render_template('index.html')
