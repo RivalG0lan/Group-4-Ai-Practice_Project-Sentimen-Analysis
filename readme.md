@@ -22,7 +22,7 @@ Selain itu, aplikasi juga menampilkan:
 
 ## Full Page Website
 
-![Website Preview](static/img/website%20full%20page.jpeg)
+![Website Preview](static/img/website-full-page.jpeg)
 
 ---
 
