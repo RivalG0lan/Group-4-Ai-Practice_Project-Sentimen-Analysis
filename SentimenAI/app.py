@@ -1,5 +1,40 @@
+# ─── Auto-install dependencies ────────────────────────────────────────────────
+import subprocess
+import sys
+
+REQUIRED = [
+    'flask',
+    'flask-cors',
+    'joblib',
+    'numpy',
+    'pandas',
+    'scikit-learn',
+    'openpyxl',
+]
+
+def install_if_missing(packages):
+    import importlib
+    # mapping nama pip → nama import
+    pip_to_import = {
+        'flask-cors': 'flask_cors',
+        'scikit-learn': 'sklearn',
+        'pillow': 'PIL',
+    }
+    for pkg in packages:
+        import_name = pip_to_import.get(pkg, pkg)
+        try:
+            importlib.import_module(import_name)
+        except ImportError:
+            print(f"[AUTO-INSTALL] '{pkg}' tidak ditemukan, menginstall...")
+            subprocess.check_call([sys.executable, '-m', 'pip', 'install', pkg])
+            print(f"[AUTO-INSTALL] '{pkg}' berhasil diinstall!")
+
+install_if_missing(REQUIRED)
+# ──────────────────────────────────────────────────────────────────────────────
+
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+# ... sisa import seperti biasa
 import joblib
 import numpy as np
 import pandas as pd
