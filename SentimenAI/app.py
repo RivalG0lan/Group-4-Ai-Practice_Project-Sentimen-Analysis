@@ -257,7 +257,7 @@ def insight_gemini():
     Fokus: kualitas produk, pengemasan, pengiriman, layanan pelanggan.
     Format: paragraf mengalir, maksimal 3 paragraf."""
 
-    GEMINI_KEY = "AIzaSyCSE7Y8kWB7JKAA4vVWKEZH8Q7SjVygoh8"
+    GEMINI_KEY = "YOUR_GEMINI_API_KEY_HERE"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_KEY}"
 
     # debug prompt Gemini
